@@ -4,6 +4,11 @@ from django.contrib import messages
 from .forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout as django_logout
+from .forms import ProfileUpdateForm, UserUpdateForm
+from .models import Profile  # Profile modelini import et
 
 def register(request):
     if request.method == "POST":
@@ -24,6 +29,12 @@ def profile(request):
 
 @login_required
 def profile_update(request):
+
+    try:
+        profile = request.user.profile  # Kullanıcının profilini alır
+    except Profile.DoesNotExist:
+        profile = None
+
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST,
@@ -45,3 +56,6 @@ def profile_update(request):
         "p_form": p_form
     }
     return render(request, 'users/profile_update.html', context)
+
+def logout(request):
+    return render (request, 'users/logout.html')
